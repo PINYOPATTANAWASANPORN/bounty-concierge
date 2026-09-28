@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-09-27T11:52:09.768077+00:00",
-  "total_count": 272,
+  "updated_at": "2026-09-28T13:38:06.418760+00:00",
+  "total_count": 270,
   "bounties": [
     {
       "repo": "Scottcjn/rustchain-bounties",
@@ -1111,8 +1111,7 @@
       "body": "## The problem\n\nFour separate defects were found in the bounty payout pipeline on 2026-08-07/08, and all four shared one shape: **something reported success while doing nothing.** None raised an error. None turned a workflow red.\n\n- `transfer()` returned success on an HTTP 200 carrying `{\"ok\": false}` \u2014 claims were closed and publicly confirmed with no RTC sent (#16390)\n- The payout's candidate sweep used `--limit 400` against 2,375 open issues, so any verified claim outside the newest 400 could never be paid, silently\n- `confirm_pending.sh` had no execute bit for ~3 months. Cron fired it every 10 minutes into a permission error, and because the script's own logging lived inside the block that failed to run, **nothing was logged at all**\n- `gh issue edit --add-label` fails on a GraphQL deprecation **without a non-zero exit**, so a gate posted \"verified\" and never marked the claim payable\n\nEach was found by accident. There is no reason to think they were the last four.\n\n## What this bounty is\n\nAudit the payout and reward paths for **more of this class**. Not style, not coverage \u2014 specifically: *code that can complete successfully while achieving nothing, or achieving the wrong thing, without surfacing an error.*\n\nIn scope:\n- `scripts/bounty_payout.py`, `scripts/docstring_gate.py`, `scripts/pr_review_gate.py`, `scripts/pr_review_gate_backfill.py`\n- `/root/rustchain/` payout, settlement and confirmation paths on the live node (ask for read access)\n- The workflows that drive them\n\n## What qualifies for payment\n\nA finding must name **a concrete path where the code succeeds and the effect does not happen**, with the reasoning for why. A proof of concept is welcome but not required if the reading is unambiguous.\n\nNot payable: general hardening advice, dependency CVEs with no demonstrated path, style, or \"add more tests\" without a specific defect behind it.\n\n## Reward\n\n**35 RTC** for the audit, plus **10 RTC per confirmed defect** of this class beyond the first, uncapped.\n\nPaid on the finding, not on a fix. A clear writeup of a real defect is worth more here than a patch for a hypothetical one.\n",
       "url": "https://github.com/Scottcjn/rustchain-bounties/issues/16471",
       "labels": [
-        "bounty",
-        "claimed"
+        "bounty"
       ],
       "created_at": "2026-08-10T17:31:52Z",
       "reward_rtc": 35.0,
@@ -1635,7 +1634,8 @@
       "body": "## The problem\n\nSome BoTTube pull requests fail four checks at once \u2014 `label`, `lint`, `security`, `test` \u2014 and every one reports a duration of **15m01s**. That is a job timeout, not a test failure.\n\nConfirmed examples: bottube#1640 and bottube#1639. On those two, `label` fails despite passing on all 30 other open PRs in the repo, which is what rules out the contributors' code as the cause.\n\nThe effect is that contributors are told their work failed CI when the runner hung. At least two people were asked to chase a failure that was never theirs.\n\n## What this bounty is\n\nFind out why those jobs hang, and fix it.\n\nLikely directions, not prescriptions:\n- A step with no timeout waiting on something that never returns (network fetch, package index, external API)\n- Runner resource exhaustion when several workflows fire on the same commit\n- A dependency install that hangs rather than failing\n\n## What qualifies for payment\n\n- A named root cause, evidenced from job logs rather than inferred\n- A fix that makes the hang either impossible or fast-failing with a clear message\n- **Explicit per-step timeouts** so that if it recurs, CI says \"timed out after N minutes\" instead of pretending the code failed\n\n## Reward\n\n**20 RTC.** Add **5 RTC** if the fix also distinguishes a genuine timeout from a genuine failure in what the contributor sees, since the current confusion is the actual damage.\n",
       "url": "https://github.com/Scottcjn/rustchain-bounties/issues/16472",
       "labels": [
-        "bounty"
+        "bounty",
+        "claimed"
       ],
       "created_at": "2026-08-10T17:31:53Z",
       "reward_rtc": 20.0,
@@ -1889,8 +1889,7 @@
       "body": "## Tear apart RIP-0301 \u2014 paid critique of the Tip Credits + Atlas Land design\n\n**RIP-0301** (Tip Credits + Atlas Land Economy) is open for comment: https://github.com/Scottcjn/bottube/issues/1309\n\nWe don't want rubber-stamps. We want the design **stress-tested** by the people who'd try to game it. This bounty pays for *substantive, specific* critique that makes the RFC better.\n\n### What earns RTC\nPost your critique **as a comment on RIP-0301 (#1309)**, then claim here with a link. We're especially looking for answers to the three seeded attack questions:\n1. **Maturation-rate gaming** \u2014 what should Tip Credit \u2192 RTC maturation be a function of so wash-tipping isn't worth the wait?\n2. **Sybil land-grabs** \u2014 what stops one operator claiming N Atlas parcels with N Beacon IDs pointed at one trivial service?\n3. **Tip-wash trading** \u2014 show the math where an A\u2194B tip loop stops paying.\n4. **A fourth failure mode** none of the above cover (name + explain it).\n\n### Reward tiers (maintainer-judged, anti-farm)\n| Finding | RTC |\n|---|---|\n| **Best critique** \u2014 surfaces a real, specific flaw AND proposes a concrete fix (gets cited in the RIP revision) | **25** |\n| Solid secondary critique \u2014 a valid, specific concern with reasoning | **10** |\n| A genuinely-new fourth failure mode (named + explained) | **10** |\n\nPool: 100 RTC. **One claim per contributor.** Native `RTC\u2026` wallet required (RTC has no off-ramp \u2014 no Solana/wRTC/ETH).\n\n### What does NOT earn\n\"Looks good\", \"great idea\", restating the RFC, emoji reactions, vague \"consider X\" with no reasoning, or AI-generated boilerplate that doesn't engage the actual mechanism. Maintainer judgment is the gate \u2014 that's deliberate; a bounty farm can't scale past it.\n\nThis is the kind of work that compounds: a sharp critique here shapes a token mechanism real agents will use. Bring your best attack.",
       "url": "https://github.com/Scottcjn/rustchain-bounties/issues/13224",
       "labels": [
-        "bounty",
-        "claimed"
+        "bounty"
       ],
       "created_at": "2026-06-06T15:41:33Z",
       "reward_rtc": 17.0,
@@ -1927,8 +1926,7 @@
       "body": "## Bounty: Integrate RustChain as a native LangChain tool\n\nRustChain's HTTP API is agent-native (no auth, no captcha, wallet = any string, same-day RTC payout). We want it to be a **first-class tool inside the LangChain ecosystem** so any Python agent builder can drop it into a chain with `from langchain_community.tools.rustchain import RustChainTool`.\n\n### Deliverables\n\n1. A LangChain `BaseTool` subclass exposing at minimum:\n   - `check_balance(wallet_id: str) -> float`\n   - `list_bounties(limit: int = 10) -> list[dict]`\n   - `get_node_health() -> dict`\n   - `get_current_epoch() -> dict`\n2. A working example notebook or script showing an agent using the tool to check balance + list bounties + pick one to claim.\n3. A PR to [langchain-ai/langchain-community](https://github.com/langchain-ai/langchain-community) adding the tool under `libs/community/langchain_community/tools/rustchain/` OR a standalone pip-installable package with `langchain-rustchain` on PyPI \u2014 either works.\n4. README with install + usage + a link back to this bounty repo.\n\n### Acceptance\n\n- PR to langchain-community is **open** (doesn't need to be merged \u2014 their review is slow) OR PyPI package is live.\n- Tool works end-to-end against `https://rustchain.org` (our public node).\n- Example agent runs without errors.\n\n### Payout\n\n**25 RTC** on delivery. +10 RTC bonus if the PR to langchain-community gets merged. +5 RTC bonus if you cross-post to r/LangChain or the LangChain Discord with a link back.\n\n### Why this matters\n\nLangChain has ~80K stars and is the default framework for many AI-agent pipelines. Being a native LangChain tool means any agent builder who types `from langchain_community.tools import` in their IDE sees us as an autocomplete option.\n\nAgents welcome on this one \u2014 if your loop can write Python and open a PR, you qualify.\n",
       "url": "https://github.com/Scottcjn/rustchain-bounties/issues/3074",
       "labels": [
-        "bounty",
-        "claimed"
+        "bounty"
       ],
       "created_at": "2026-04-17T03:03:05Z",
       "reward_rtc": 17.0,
@@ -2252,7 +2250,8 @@
         "bug",
         "bounty",
         "open",
-        "standard"
+        "standard",
+        "claimed"
       ],
       "created_at": "2026-07-19T21:43:36Z",
       "reward_rtc": 10.0,
@@ -3768,44 +3767,6 @@
         "bounty"
       ],
       "created_at": "2026-03-18T16:35:36Z",
-      "reward_rtc": 3.0,
-      "difficulty": "micro",
-      "skills": [
-        "javascript",
-        "rust"
-      ]
-    },
-    {
-      "repo": "Scottcjn/rustchain-bounties",
-      "number": 2139,
-      "title": "[BOUNTY: 3 RTC each] Fix BoTTube accessibility issues (4 open bugs)",
-      "body": "## Fix BoTTube Accessibility Bugs\n\n**Reward: 3 RTC per issue fixed** (up to 12 RTC for all 4)\n\nFour accessibility issues are open on the BoTTube repo. Fix any or all:\n\n1. [#406](https://github.com/Scottcjn/bottube/issues/406) \u2014 Missing aria-labels on icon-only buttons (Subscribe, Tip, Comment votes)\n2. [#407](https://github.com/Scottcjn/bottube/issues/407) \u2014 Multiple form inputs missing accessible labels on watch page\n3. [#418](https://github.com/Scottcjn/bottube/issues/418) \u2014 Missing alt text on video thumbnails\n4. [#419](https://github.com/Scottcjn/bottube/issues/419) \u2014 Insufficient color contrast on secondary text\n\n**How to claim**:\n1. Fork [Scottcjn/bottube](https://github.com/Scottcjn/bottube)\n2. Fix one or more issues in the templates (`bottube_templates/`)\n3. Submit a PR referencing the issue numbers\n4. Post your PR link + RTC wallet here\n\nWCAG 2.1 AA compliance is the target.",
-      "url": "https://github.com/Scottcjn/rustchain-bounties/issues/2139",
-      "labels": [
-        "bounty",
-        "easy",
-        "bottube",
-        "accessibility"
-      ],
-      "created_at": "2026-03-16T17:06:07Z",
-      "reward_rtc": 3.0,
-      "difficulty": "micro",
-      "skills": [
-        "social-media"
-      ]
-    },
-    {
-      "repo": "Scottcjn/rustchain-bounties",
-      "number": 1600,
-      "title": "[BOUNTY: 3 RTC] Build a web dashboard showing RustChain stats",
-      "body": "Web page with live epoch, miner count, supply, transactions. Auto-refresh. Any framework. 5 RTC, +3 for mobile responsive. Tags: frontend, dashboard, web, javascript, react, bounty, blockchain",
-      "url": "https://github.com/Scottcjn/rustchain-bounties/issues/1600",
-      "labels": [
-        "bounty",
-        "feature",
-        "frontend"
-      ],
-      "created_at": "2026-03-10T23:48:43Z",
       "reward_rtc": 3.0,
       "difficulty": "micro",
       "skills": [
