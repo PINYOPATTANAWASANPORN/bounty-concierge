@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-29T12:37:42.679376+00:00",
+  "updated_at": "2026-09-30T12:23:11.090021+00:00",
   "total_count": 270,
   "bounties": [
     {
@@ -1731,8 +1731,7 @@
       "labels": [
         "bounty",
         "community",
-        "development",
-        "claimed"
+        "development"
       ],
       "created_at": "2026-03-07T00:15:24Z",
       "reward_rtc": 20.0,
@@ -4510,8 +4509,7 @@
       "labels": [
         "bounty",
         "open",
-        "community",
-        "claimed"
+        "community"
       ],
       "created_at": "2026-02-12T03:04:09Z",
       "reward_rtc": 2.0,
