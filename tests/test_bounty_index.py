@@ -68,6 +68,24 @@ class TestParseReward:
         reward = bounty_index.parse_reward(title, "")
         assert reward == 10000.0
 
+    def test_parse_range_hyphen_returns_floor(self):
+        """Should parse '5-50 RTC' range to floor amount (5.0)."""
+        title = "[BOUNTY: 5-50 RTC] Beacon Atlas"
+        reward = bounty_index.parse_reward(title, "")
+        assert reward == 5.0
+
+    def test_parse_range_en_dash_and_to_keyword(self):
+        """Should parse ranges using en-dash or 'to'."""
+        title1 = "[BOUNTY: 50–200 RTC] Video tutorial"
+        title2 = "[BOUNTY: 10 to 20 RTC] Integration task"
+        assert bounty_index.parse_reward(title1, "") == 50.0
+        assert bounty_index.parse_reward(title2, "") == 10.0
+
+    def test_parse_range_in_body_returns_floor(self):
+        """Should parse reward range in body to floor amount."""
+        reward = bounty_index.parse_reward("Task", "Bounty range: 2-4 RTC for participation")
+        assert reward == 2.0
+
     def test_title_takes_priority_over_body(self):
         """When both title and body have RTC, title value is returned first."""
         title = "Fix: 8 RTC reward"
