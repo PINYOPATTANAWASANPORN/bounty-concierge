@@ -55,7 +55,9 @@ def check_history(wallet_id: str, node_url: str | None = None) -> List[dict]:
             return []
         resp.raise_for_status()
         data = resp.json()
-        return data if isinstance(data, list) else data.get("history", [])
+        if isinstance(data, list):
+            return data
+        return data.get("transactions") or data.get("history", [])
     except requests.RequestException:
         return []
 
@@ -70,7 +72,8 @@ def format_payout_status(pending: List[dict], history: List[dict]) -> str:
         ``amount_rtc`` and optionally ``memo``, ``created_at``.
     history : list[dict]
         Items from :func:`check_history`.  Each dict should have at least
-        ``amount_rtc``, ``from``, ``to``, and optionally ``timestamp``.
+        ``amount_rtc`` (or ``amount``), ``from``, ``to`` (or direction inferred from ``type``),
+        and optionally ``timestamp``.
     """
     lines: list[str] = []
 
@@ -80,9 +83,9 @@ def format_payout_status(pending: List[dict], history: List[dict]) -> str:
         lines.append("  (none)")
     else:
         for item in pending:
-            amount = item.get("amount_rtc", "?")
+            amount = item.get("amount_rtc") if "amount_rtc" in item else item.get("amount", "?")
             memo = item.get("memo", "")
-            ts = item.get("created_at", "")
+            ts = item.get("created_at") or item.get("timestamp", "")
             entry = f"  {amount} RTC"
             if memo:
                 entry += f"  memo: {memo}"
@@ -98,9 +101,15 @@ def format_payout_status(pending: List[dict], history: List[dict]) -> str:
         lines.append("  (none)")
     else:
         for item in history:
-            amount = item.get("amount_rtc", "?")
+            amount = item.get("amount_rtc") if "amount_rtc" in item else item.get("amount", "?")
             sender = item.get("from", "?")
-            recipient = item.get("to", "?")
+            recipient = item.get("to")
+            if recipient is None:
+                tx_type = item.get("type", "")
+                if tx_type == "transfer_in":
+                    recipient = "(you)"
+                else:
+                    recipient = "?"
             ts = item.get("timestamp", "")
             entry = f"  {amount} RTC  {sender} -> {recipient}"
             if ts:

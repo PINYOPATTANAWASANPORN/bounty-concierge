@@ -76,6 +76,25 @@ class TestCheckHistory:
         )
 
     @patch("concierge.payout_tracker.requests.get")
+    def test_history_accepts_live_node_transactions_payload(self, mock_get):
+        live_payload = {
+            "miner_id": "stmr",
+            "ok": True,
+            "total": 2,
+            "transactions": [
+                {"amount": 12, "from": "founder_team_bounty", "type": "transfer_in"},
+                {"amount": 2, "from": "founder_community", "type": "transfer_in"},
+            ],
+        }
+        mock_get.return_value = _response(payload=live_payload)
+
+        result = payout_tracker.check_history("stmr", node_url="https://node")
+
+        assert len(result) == 2
+        assert result[0]["amount"] == 12
+        assert result[0]["from"] == "founder_team_bounty"
+
+    @patch("concierge.payout_tracker.requests.get")
     def test_history_unexpected_dict_without_history_returns_empty(self, mock_get):
         mock_get.return_value = _response(payload={"status": "ok"})
 
@@ -111,6 +130,28 @@ class TestFormatPayoutStatus:
 
         assert "3.5 RTC  memo: bounty  (2026-05-12)" in output
         assert "2 RTC  treasury -> alice  (2026-05-13)" in output
+
+    def test_formats_live_node_transactions_with_inferred_recipient(self):
+        output = payout_tracker.format_payout_status(
+            [],
+            [
+                {
+                    "amount": 12,
+                    "from": "founder_team_bounty",
+                    "type": "transfer_in",
+                    "timestamp": 1784585686,
+                },
+                {
+                    "amount": 2,
+                    "from": "founder_community",
+                    "type": "transfer_in",
+                    "timestamp": 1788049201,
+                },
+            ],
+        )
+
+        assert "12 RTC  founder_team_bounty -> (you)  (1784585686)" in output
+        assert "2 RTC  founder_community -> (you)  (1788049201)" in output
 
     def test_missing_fields_use_question_mark_placeholders(self):
         output = payout_tracker.format_payout_status([{}], [{}])
