@@ -96,8 +96,9 @@ class TestCheckWalletExists(unittest.TestCase):
 
     @patch("concierge.wallet_helper._get")
     def test_wallet_exists(self, mock_get):
-        mock_get.return_value = {"miner_id": "alice", "balance_rtc": 42.0}
+        mock_get.return_value = {"miner_id": "alice", "amount_rtc": 42.0, "balance_rtc": 42.0}
         self.assertTrue(wallet_helper.check_wallet_exists("alice"))
+        mock_get.assert_called_once_with("/wallet/balance", params={"miner_id": "alice"})
 
     @patch("concierge.wallet_helper._get")
     def test_wallet_not_found(self, mock_get):
@@ -126,7 +127,7 @@ class TestGetBalance(unittest.TestCase):
         mock_get.return_value = {"miner_id": "alice", "balance_rtc": 100.5}
         result = wallet_helper.get_balance("alice")
         self.assertEqual(result["balance_rtc"], 100.5)
-        mock_get.assert_called_once_with("/balance", params={"miner_id": "alice"})
+        mock_get.assert_called_once_with("/wallet/balance", params={"miner_id": "alice"})
 
     @patch("concierge.wallet_helper._get")
     def test_returns_error(self, mock_get):
