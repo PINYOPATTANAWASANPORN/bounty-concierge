@@ -429,3 +429,21 @@ class TestGrokApiMocking:
 
         result = faq_engine.ask_grok("question")
         assert "[error]" in result
+
+
+class TestPhrasingAndSafetyMatching:
+    """Tests for realistic phrasing matching and wRTC safety guidance."""
+
+    def test_how_do_i_get_paid_matches_payouts(self):
+        """'how do i get paid' should route to payout answers, not wallet setup."""
+        key, answer, score = faq_engine.fuzzy_match("how do i get paid")
+        assert "payout" in key or "paid" in key
+        assert score >= 0.3
+        assert "RTC" in answer
+
+    def test_withdrawal_reaches_wrtc_warning(self):
+        """Questions about withdrawing RTC reach the wRTC safety warning."""
+        key, answer, score = faq_engine.fuzzy_match("why cant i withdraw rtc")
+        assert "wrtc" in key or "withdraw" in key
+        assert score >= 0.3
+        assert "discontinued" in answer or "Do not send funds" in answer
